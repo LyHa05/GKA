@@ -1,5 +1,11 @@
 package aufgabe01;
 
+/**
+ * @author Lydia Pflug, Lucas Anders
+ * @date 27.09.2016
+ *
+ */
+
 import java.io.File;
 import javafx.application.Application;
 import javafx.stage.FileChooser;
