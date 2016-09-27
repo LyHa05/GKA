@@ -7,10 +7,14 @@ package aufgabe01;
  */
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.MultiGraph;
 
 public class Parser {
@@ -32,14 +36,23 @@ public class Parser {
 	static void einlesenGraph() throws IOException {
 		dateiPfad = MeinFileChooser.chooseFile().toPath();
 		System.out.println(dateiPfad);
-		geleseneZeilen = Files.lines(dateiPfad).collect(Collectors.toList());
-		boolean syntaxOK = pruefenSyntax();
-		if (syntaxOK) {
-			incrementGraphID();
-			erstellenGraphen();
-		} else {
-			System.err.println("Der Graph konnte nicht eingelesen werden.");
-		}
+		geleseneZeilen = Files.lines(dateiPfad,Charset.forName("ISO_8859_1")).collect(Collectors.toList());
+		List<String> lesen = Files.lines(dateiPfad,Charset.forName("ISO_8859_1"))
+				.map(string -> string.replaceAll(" ",""))
+				.flatMap(line -> Stream.of(line.split(";")))
+				.collect(Collectors.toList());
+		
+
+		System.out.println(lesen);
+				
+//		boolean syntaxOK = pruefenSyntax();
+//		if (syntaxOK) {
+//			incrementGraphID();
+//			erstellenGraphen();
+//		} else {
+//			System.err.println("Der Graph konnte nicht eingelesen werden.");
+//		}
+//		graph.display();
 	}
 	
 	/**
@@ -53,13 +66,37 @@ public class Parser {
 	 * Methode erstellt Multigraphen.
 	 */
 	private static void erstellenGraphen() {
-		
+				
 		graph = new MultiGraph(String.valueOf(graphID));
 		System.out.println(graph);
 		
+		// durchlaufen der einzelnen Zeilen
 		for (String zeile : geleseneZeilen) {
 			String[] zeilenArray = zeile.split(" ");
 			
+			String knoten1 = zeilenArray[0].trim();
+			
+			// pruefen, ob mehr als Knoten enthalten ist
+			if (zeilenArray.length > 1) {
+			
+				String knoten2 = zeilenArray[2].trim();
+				boolean gerichteteKante = true;
+				if (zeilenArray[1].trim().equals("--")) {
+					gerichteteKante = false;
+				} else if (zeilenArray[1].trim().equals("->")) {
+					gerichteteKante = true;
+				}
+						
+
+
+					graph.addNode(knoten1);
+
+					graph.addNode(knoten2);
+
+
+				graph.addEdge((knoten1 + knoten2), knoten1, knoten2, gerichteteKante);
+
+			}
 			
 			System.out.println(zeile);
 		}
