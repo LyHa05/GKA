@@ -11,10 +11,12 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.graphstream.graph.Node;
+import aufgabe01.PredicateUtility;
+
 import org.graphstream.graph.implementations.MultiGraph;
 
 public class Parser {
@@ -30,10 +32,9 @@ public class Parser {
 	 * Methode liest aus Datei Graph ein, prueft die Syntax, inkrementiert die Graphen-ID
 	 * und erstellt einen Multigraphen. Ist die Syntax der Datei fehlerhaft wird eine
 	 * Fehlermeldung angezeigt.
-	 * 
-	 * @throws IOException
+	 * @throws Exception 
 	 */
-	static void einlesenGraph() throws IOException {
+	static void einlesenGraph() throws Exception {
 		dateiPfad = MeinFileChooser.chooseFile().toPath();
 		System.out.println(dateiPfad);
 		geleseneZeilen = Files.lines(dateiPfad,Charset.forName("ISO_8859_1")).collect(Collectors.toList());
@@ -42,8 +43,17 @@ public class Parser {
 				.flatMap(line -> Stream.of(line.split(";")))
 				.collect(Collectors.toList());
 		
-
 		System.out.println(lesen);
+		
+		boolean syntaxOK = lesen.stream().allMatch(syntaxAnforderungen());
+
+		System.out.println(syntaxOK);
+		
+		// pruefen, ob nur Zeichen und Zahlen enthalten (ein Knoten)
+		// pruefen, ob Zeichen/Zahlen und dann -> oder -- mit wiederum Zeichen/Zahlen enthalten
+		// pruefen, ob NICHT mehrfachh -> oder -- enthalten
+		// pruefen, ob nach 2. noch in Klammern Kantenname enthalten
+		// pruefen, ob nach 2. noch : mit Zeichen/Zahlen enthalten
 				
 //		boolean syntaxOK = pruefenSyntax();
 //		if (syntaxOK) {
@@ -53,6 +63,19 @@ public class Parser {
 //			System.err.println("Der Graph konnte nicht eingelesen werden.");
 //		}
 //		graph.display();
+	}
+	
+	private static Predicate<String> syntaxAnforderungen() throws Exception {
+		
+		Predicate<String> result = PredicateUtility.orAny(string -> string.contains("[0-9A-Za-z]"),
+                string -> string.contains("[0-9A-Za-z]" + "--" + "[0-9A-Za-z]"),
+                string -> string.contains("ab"),
+                string -> string.contains("cd"),
+                string -> string.contains("[0-9A-Za-z]" + "->" + "[0-9A-Za-z]"));
+		
+		
+		return result;
+		
 	}
 	
 	/**
