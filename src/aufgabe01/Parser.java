@@ -67,12 +67,22 @@ public class Parser {
 	
 	private static Predicate<String> syntaxAnforderungen() throws Exception {
 		
-		Predicate<String> result = PredicateUtility.orAny(string -> string.contains("[0-9A-Za-z]"),
-                string -> string.contains("[0-9A-Za-z]" + "--" + "[0-9A-Za-z]"),
-                string -> string.contains("ab"),
-                string -> string.contains("cd"),
-                string -> string.contains("[0-9A-Za-z]" + "->" + "[0-9A-Za-z]"));
+		Predicate<String> result = PredicateUtility.orAny(
+				// enthaelt nur Knoten
+				string -> string.matches("^[0-9a-zA-Z]*$")
+				// enthaelt 2 Knoten und 1 Kante
+                ,string -> string.matches("(^[0-9a-zA-Z\\w]*)(--|->)([0-9a-zA-Z]*$)")
+                // enthaelt 2 Knoten und 1 Kante und Kantenname
+                ,string -> string.matches("(^[0-9a-zA-Z\\w]*)(--|->)([0-9a-zA-Z\\w]*)([\\(][0-9a-zA-Z\\w]*[\\)])")
+                // enthaelt 2 Knoten und 1 Kante und Kantengewicht
+                ,string -> string.matches("(^[0-9a-zA-Z\\w]*)(--|->)([0-9a-zA-Z\\w]*)(:[0-9]*.?[0-9]*)")               
+                // enthaelt 2 Knoten und 1 Kante und Kantenname und Kantengewicht
+                ,string -> string.matches("(^[0-9a-zA-Z\\w]*)(--|->)([0-9a-zA-Z\\w]*)([\\(][0-9a-zA-Z\\w]*[\\)])(:[0-9]*.?[0-9]*)")
+				);
 		
+//		+ mindestens einer 
+//		* keiner, einer, viel
+//		? kann muss nicht
 		
 		return result;
 		
