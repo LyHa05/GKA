@@ -11,6 +11,6 @@ import java.io.IOException;
 public class TestKlasse {
 
 	public static void main(String[] args) throws Exception {
-		Parser.einlesenGraph();
+		Parser.einlesenDatei();
 	}
 }

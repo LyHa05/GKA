@@ -1,22 +1,17 @@
 package aufgabe01;
 
-/**
- * @author Lydia Pflug, Lucas Anders
- * @date 27.09.2016
- *
- */
-
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import aufgabe01.PredicateUtility;
-
+import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.MultiGraph;
 
 public class Parser {
@@ -27,6 +22,7 @@ public class Parser {
 	private static List<String> geleseneZeilen;
 	private static MultiGraph graph;
 	private static int graphID = 0;
+	private static String regexGraph;
 	
 	/**
 	 * Methode liest aus Datei Graph ein, prueft die Syntax, inkrementiert die Graphen-ID
@@ -34,10 +30,9 @@ public class Parser {
 	 * Fehlermeldung angezeigt.
 	 * @throws Exception 
 	 */
-	static void einlesenGraph() throws Exception {
+	static void einlesenDatei() throws Exception {
 		dateiPfad = MeinFileChooser.chooseFile().toPath();
 		System.out.println(dateiPfad);
-//		geleseneZeilen = Files.lines(dateiPfad,Charset.forName("ISO_8859_1")).collect(Collectors.toList());
 		geleseneZeilen = Files.lines(dateiPfad,Charset.forName("ISO_8859_1"))
 				.map(string -> string.replaceAll(" ",""))
 				.flatMap(line -> Stream.of(line.split(";")))
@@ -45,13 +40,16 @@ public class Parser {
 		
 		System.out.println(geleseneZeilen);
 		
+		setRegex();
+		
 		boolean syntaxOK = geleseneZeilen.stream().allMatch(syntaxAnforderungen());
 
 		System.out.println(syntaxOK);
 
 		if (syntaxOK) {
 			incrementGraphID();
-			erstellenGraphen();
+//			erstellenGraphen();
+			patternDaten();
 		} else {
 			System.err.println("Der Graph konnte nicht eingelesen werden.");
 		}
@@ -67,12 +65,12 @@ public class Parser {
 	 */
 	private static Predicate<String> syntaxAnforderungen() {
 		
-		return aktuelleZeile -> aktuelleZeile.matches(""
-				+ "(?<quelle> ^[0-9a-zA-Z\\w]+)" 				// enthaelt nur Knoten
-				+ "(((?<kante> --|->)(?<ziel> [0-9a-zA-Z\\w]+))"		// enthaelt Kante und zweiten Knoten
-				+ "(?<kantenname> [\\(][0-9a-zA-Z\\w]+[\\)])?"	// enthaelt Kantenname
-				+ "(?<kantengewicht> :[0-9]+.?[0-9]*)?)?"			// enthaelt Kantengewicht
-				);
+		return aktuelleZeile -> aktuelleZeile.matches(regexGraph);
+//				+ "(?<quelle>^[0-9a-zA-Z\\w]+)" 					// enthaelt nur Knoten
+//				+ "(((?<kante>--|->)(?<ziel>[0-9a-zA-Z\\w]+))"	// enthaelt Kante und zweiten Knoten
+//				+ "(?<kantenname>[\\(][0-9a-zA-Z\\w]+[\\)])?"		// enthaelt Kantenname
+//				+ "(?<kantengewicht>:[0-9]+.?[0-9]*)?)?"			// enthaelt Kantengewicht
+//				);
 				
 //		return PredicateUtility.orAny(
 				// enthaelt nur Knoten
@@ -134,6 +132,12 @@ public class Parser {
 
 				graph.addEdge((knoten1 + knoten2), knoten1, knoten2, gerichteteKante);
 
+//				Pattern 
+//				Matcher
+//				.find aufrufen, danach können Ausdrücke gefunden werden
+				
+				
+				
 			}
 			
 			System.out.println(zeile);
@@ -142,4 +146,52 @@ public class Parser {
 		
 	}
 
+	private static void setRegex() {
+		regexGraph = ""
+				+ "(?<quelle>^[0-9a-zA-Z\\w]+)" 					// enthaelt nur Knoten
+				+ "(((?<kante>--|->)(?<ziel>[0-9a-zA-Z\\w]+))"		// enthaelt Kante und zweiten Knoten
+				+ "(?<kantenname>[\\(][0-9a-zA-Z\\w]+[\\)])?"		// enthaelt Kantenname
+				+ "(?<kantengewicht>:[0-9]+.?[0-9]*)?)?"			// enthaelt Kantengewicht
+				;
+	}
+		
+	private static void patternDaten() {
+		
+		Pattern pattern = Pattern.compile(regexGraph);
+		
+//		graph = new MultiGraph(String.valueOf(graphID));
+//		System.out.println(graph);
+		
+		HashSet<String> knotenSet = new HashSet<String>();
+		
+		// durchlaufen der einzelnen Zeilen
+		for (String zeile : geleseneZeilen) {
+			
+			Matcher matcher = pattern.matcher(zeile);
+			matcher.find();
+			
+			knotenSet.add(matcher.group("quelle"));
+			
+			String ziel = matcher.group("ziel");
+			
+			if(!ziel.equals("null")) {
+				knotenSet.add(ziel);
+			}
+			
+			String kante = matcher.group("kante");
+			
+			
+			graph.edgeFactory();
+		    
+//					graph.addNode(knoten1);
+//
+//					graph.addNode(knoten2);
+
+
+//				graph.addEdge((knoten1 + knoten2), knoten1, knoten2, gerichteteKante);
+
+		}
+		
+	}
+	
 }
