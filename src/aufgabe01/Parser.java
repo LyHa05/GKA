@@ -37,54 +37,59 @@ public class Parser {
 	static void einlesenGraph() throws Exception {
 		dateiPfad = MeinFileChooser.chooseFile().toPath();
 		System.out.println(dateiPfad);
-		geleseneZeilen = Files.lines(dateiPfad,Charset.forName("ISO_8859_1")).collect(Collectors.toList());
-		List<String> lesen = Files.lines(dateiPfad,Charset.forName("ISO_8859_1"))
+//		geleseneZeilen = Files.lines(dateiPfad,Charset.forName("ISO_8859_1")).collect(Collectors.toList());
+		geleseneZeilen = Files.lines(dateiPfad,Charset.forName("ISO_8859_1"))
 				.map(string -> string.replaceAll(" ",""))
 				.flatMap(line -> Stream.of(line.split(";")))
 				.collect(Collectors.toList());
 		
-		System.out.println(lesen);
+		System.out.println(geleseneZeilen);
 		
-		boolean syntaxOK = lesen.stream().allMatch(syntaxAnforderungen());
+		boolean syntaxOK = geleseneZeilen.stream().allMatch(syntaxAnforderungen());
 
 		System.out.println(syntaxOK);
-		
-		// pruefen, ob nur Zeichen und Zahlen enthalten (ein Knoten)
-		// pruefen, ob Zeichen/Zahlen und dann -> oder -- mit wiederum Zeichen/Zahlen enthalten
-		// pruefen, ob NICHT mehrfachh -> oder -- enthalten
-		// pruefen, ob nach 2. noch in Klammern Kantenname enthalten
-		// pruefen, ob nach 2. noch : mit Zeichen/Zahlen enthalten
-				
-//		boolean syntaxOK = pruefenSyntax();
-//		if (syntaxOK) {
-//			incrementGraphID();
-//			erstellenGraphen();
-//		} else {
-//			System.err.println("Der Graph konnte nicht eingelesen werden.");
-//		}
-//		graph.display();
+
+		if (syntaxOK) {
+			incrementGraphID();
+			erstellenGraphen();
+		} else {
+			System.err.println("Der Graph konnte nicht eingelesen werden.");
+		}
+		graph.display();
 	}
 	
-	private static Predicate<String> syntaxAnforderungen() throws Exception {
+	/**
+	 * Methode prueft Syntax der eingelesenen Datei und gibt als Predicate<String>
+	 * für das Matchen zurueck, sodass true oder false fuer die Syntax zurueck gegeben
+	 * werden kann.
+	 * 
+	 * @return Predicate<String>
+	 */
+	private static Predicate<String> syntaxAnforderungen() {
 		
-		Predicate<String> result = PredicateUtility.orAny(
-				// enthaelt nur Knoten
-				string -> string.matches("^[0-9a-zA-Z]*$")
-				// enthaelt 2 Knoten und 1 Kante
-                ,string -> string.matches("(^[0-9a-zA-Z\\w]*)(--|->)([0-9a-zA-Z]*$)")
-                // enthaelt 2 Knoten und 1 Kante und Kantenname
-                ,string -> string.matches("(^[0-9a-zA-Z\\w]*)(--|->)([0-9a-zA-Z\\w]*)([\\(][0-9a-zA-Z\\w]*[\\)])")
-                // enthaelt 2 Knoten und 1 Kante und Kantengewicht
-                ,string -> string.matches("(^[0-9a-zA-Z\\w]*)(--|->)([0-9a-zA-Z\\w]*)(:[0-9]*.?[0-9]*)")               
-                // enthaelt 2 Knoten und 1 Kante und Kantenname und Kantengewicht
-                ,string -> string.matches("(^[0-9a-zA-Z\\w]*)(--|->)([0-9a-zA-Z\\w]*)([\\(][0-9a-zA-Z\\w]*[\\)])(:[0-9]*.?[0-9]*)")
+		return aktuelleZeile -> aktuelleZeile.matches(""
+				+ "(?<quelle> ^[0-9a-zA-Z\\w]+)" 				// enthaelt nur Knoten
+				+ "(((?<kante> --|->)(?<ziel> [0-9a-zA-Z\\w]+))"		// enthaelt Kante und zweiten Knoten
+				+ "(?<kantenname> [\\(][0-9a-zA-Z\\w]+[\\)])?"	// enthaelt Kantenname
+				+ "(?<kantengewicht> :[0-9]+.?[0-9]*)?)?"			// enthaelt Kantengewicht
 				);
+				
+//		return PredicateUtility.orAny(
+				// enthaelt nur Knoten
+//				string -> string.matches("^[0-9a-zA-Z\\w]*$")
+				// enthaelt 2 Knoten und 1 Kante
+//                ,string -> string.matches("(^[0-9a-zA-Z\\w]*)(--|->)([0-9a-zA-Z]*$)")
+                // enthaelt 2 Knoten und 1 Kante und Kantenname
+//                ,string -> string.matches("(^[0-9a-zA-Z\\w]*)(--|->)([0-9a-zA-Z\\w]*)([\\(][0-9a-zA-Z\\w]*[\\)])")
+                // enthaelt 2 Knoten und 1 Kante und Kantengewicht
+//                ,string -> string.matches("(^[0-9a-zA-Z\\w]*)(--|->)([0-9a-zA-Z\\w]*)(:[0-9]*.?[0-9]*)")               
+                // enthaelt 2 Knoten und 1 Kante und Kantenname und Kantengewicht
+//                ,string -> string.matches("(^[0-9a-zA-Z\\w]*)(--|->)?([0-9a-zA-Z\\w]*)?([\\(][0-9a-zA-Z\\w]*[\\)])?(:[0-9]*.?[0-9]*)?")
+//				);
 		
 //		+ mindestens einer 
 //		* keiner, einer, viel
 //		? kann muss nicht
-		
-		return result;
 		
 	}
 	
@@ -132,24 +137,8 @@ public class Parser {
 			}
 			
 			System.out.println(zeile);
+			System.out.println(graph);
 		}
-		
-	}
-
-	/**
-	 * Methode prueft Syntax der eingelesenen Datei und gibt True zurueck, wenn 
-	 * alles ok ist - ansonsten false.
-	 * 
-	 * @return boolean
-	 */
-	private static boolean pruefenSyntax() {
-		for (String zeile : geleseneZeilen) {
-			if (!zeile.contains(";")) {
-				System.err.println("Die Zeile ist nicht korrekt abgeschlossen.");
-				return false;
-			}
-		}
-		return true;
 		
 	}
 
