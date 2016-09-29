@@ -29,7 +29,7 @@ public class Parser {
 	 * Fehlermeldung angezeigt.
 	 * @throws Exception 
 	 */
-	static void einlesenDatei() throws Exception {
+	static void einlesenDatei() throws Exception, IllegalArgumentException {
 		dateiPfad = MeinFileChooser.chooseFile().toPath();
 		System.out.println(dateiPfad);
 		geleseneZeilen = Files.lines(dateiPfad,Charset.forName("ISO_8859_1"))
@@ -43,14 +43,12 @@ public class Parser {
 		
 		boolean syntaxOK = geleseneZeilen.stream().allMatch(syntaxAnforderungen());
 
-		System.out.println(syntaxOK);
-
 		if (syntaxOK) {
 			incrementGraphID();
 			erstellenGraphen();
 			graph.display();
 		} else {
-			System.err.println("Der Graph konnte nicht eingelesen werden.");
+			throw new IllegalArgumentException();
 		}
 		
 	}

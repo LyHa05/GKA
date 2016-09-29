@@ -6,11 +6,15 @@ package aufgabe01;
  *
  */
 
-import java.io.IOException;
-
 public class TestKlasse {
 
 	public static void main(String[] args) throws Exception {
-		Parser.einlesenDatei();
+		
+		try {
+			Parser.einlesenDatei();
+		} catch (IllegalArgumentException e) {
+			System.err.println("Der Graph konnte nicht eingelesen werden.");
+		}
+		
 	}
 }
