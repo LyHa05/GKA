@@ -8,13 +8,9 @@ package aufgabe01;
 
 public class TestKlasse {
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws IllegalArgumentException, Exception  {
 		
-		try {
-			Parser.einlesenDatei();
-		} catch (IllegalArgumentException e) {
-			System.err.println("Der Graph konnte nicht eingelesen werden.");
-		}
+		BFS.startenAlgorithmus("a","c");
 		
 	}
 }

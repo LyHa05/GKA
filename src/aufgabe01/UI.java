@@ -30,7 +30,7 @@ public class UI {
 					break;
 				}
 				case "b": {
-					BFS.startenAlgorithmus();
+					BFS.startenAlgorithmus(s, s);
 					break;
 				}
 				case "c": {
