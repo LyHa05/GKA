@@ -29,7 +29,7 @@ public class Parser {
 	 * Fehlermeldung angezeigt.
 	 * @throws Exception 
 	 */
-	static void einlesenDatei() throws Exception, IllegalArgumentException {
+	public static MultiGraph einlesenDatei() throws Exception, IllegalArgumentException {
 		dateiPfad = MeinFileChooser.chooseFile().toPath();
 		System.out.println(dateiPfad);
 		geleseneZeilen = Files.lines(dateiPfad,Charset.forName("ISO_8859_1"))
@@ -46,10 +46,11 @@ public class Parser {
 		if (syntaxOK) {
 			incrementGraphID();
 			erstellenGraphen();
-			graph.display();
 		} else {
 			throw new IllegalArgumentException();
 		}
+		
+		return graph;
 		
 	}
 	
@@ -157,7 +158,7 @@ public class Parser {
 	/**
 	 * Methode speichert Graphen in *.gka-Datei
 	 */
-	private static void speichernGraphen() {
+	public static void speichernGraphen() {
 		
 	}
 	
