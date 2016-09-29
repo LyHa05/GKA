@@ -155,6 +155,13 @@ public class Parser {
 	}
 	
 	/**
+	 * Methode speichert Graphen in *.gka-Datei
+	 */
+	private static void speichernGraphen() {
+		
+	}
+	
+	/**
 	 * Methode ueberprueft, ob Kante in Graph enthalten ist und
 	 * gibt einen Boolean zurueck.
 	 * 
