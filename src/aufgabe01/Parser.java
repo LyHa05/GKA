@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.MultiGraph;
 
@@ -50,10 +51,11 @@ public class Parser {
 			incrementGraphID();
 //			erstellenGraphen();
 			patternDaten();
+			graph.display();
 		} else {
 			System.err.println("Der Graph konnte nicht eingelesen werden.");
 		}
-		graph.display();
+		
 	}
 	
 	/**
@@ -158,11 +160,15 @@ public class Parser {
 	private static void patternDaten() {
 		
 		Pattern pattern = Pattern.compile(regexGraph);
+//		String sQuelle = "null";
+//		String sZiel = "null";
+//		String sKante = "null";
+//		String sKantenname = "null";
+//		String sKantengewicht = "null";
+
 		
-//		graph = new MultiGraph(String.valueOf(graphID));
-//		System.out.println(graph);
-		
-		HashSet<String> knotenSet = new HashSet<String>();
+		graph = new MultiGraph("bla " + String.valueOf(graphID));
+		System.out.println(graph);
 		
 		// durchlaufen der einzelnen Zeilen
 		for (String zeile : geleseneZeilen) {
@@ -170,27 +176,111 @@ public class Parser {
 			Matcher matcher = pattern.matcher(zeile);
 			matcher.find();
 			
-			knotenSet.add(matcher.group("quelle"));
+			String sQuelle = matcher.group("quelle");
+			String sZiel = matcher.group("ziel");
+			String sKante = matcher.group("kante");
+			String sKantenname = matcher.group("kantenname");
+			String sKantengewicht = matcher.group("kantengewicht");
+			Node nQuelle = null;
+			Node nZiel = null;
+			Edge eKante = null;
+			boolean richtung;
 			
-			String ziel = matcher.group("ziel");
-			
-			if(!ziel.equals("null")) {
-				knotenSet.add(ziel);
+			// Quelle als Knoten hinzufuegen
+			if (!knotenEnthalten(sQuelle)) {
+				System.out.println("!knotenEnthalten(sQuelle) " + (!knotenEnthalten(sQuelle)));
+				nQuelle = graph.addNode(sQuelle);
 			}
 			
-			String kante = matcher.group("kante");
+			// Ziel als Knoten hinzufuegen
+			if(!sZiel.equals("null") && !knotenEnthalten(sZiel)) {
+				nZiel = graph.addNode(sZiel);
+			}
 			
+			// Kanten hinzufuegen
+			if(!sKante.equals("null") && !kanteEnthalten(sQuelle + sZiel)) {
+				if (sKante.equals("--")) {
+					richtung = false;
+				} else {
+					richtung = true;
+				}
+				
+				// falls Quellknoten schon vorhanden, bestehenden Knoten aufrufen
+				if (nQuelle == null) {
+					nQuelle = graph.getNode(sQuelle);
+				}
+				
+				// falls Quellknoten schon vorhanden, bestehenden Knoten aufrufen
+				if (nZiel == null) {
+					nZiel = graph.getNode(sZiel);
+				}
+				
+				System.out.println(eKante);
+				// mit gerichtetem oder ungerichtetem Pfeil
+				eKante = graph.addEdge((sQuelle+sZiel), nQuelle, nZiel, richtung);			
+				
+				// mit Kantenname
+				if(sKantenname != null) {
+					eKante.addAttribute("Kantenname", sKantenname);
+				}
+				
+				// mit Kantengewicht
+				if(sKantengewicht != null) {
+					eKante.addAttribute("Kantengewicht", sKantengewicht);
+				}
+				
+			}
 			
-			graph.edgeFactory();
-		    
-//					graph.addNode(knoten1);
-//
-//					graph.addNode(knoten2);
-
-
-//				graph.addEdge((knoten1 + knoten2), knoten1, knoten2, gerichteteKante);
-
 		}
+		
+	}
+	
+	
+	
+	/**
+	 * Methode ueberprueft, ob Kante in Graph enthalten ist und
+	 * gibt einen Boolean zurueck.
+	 * 
+	 * @param e
+	 * @return true, wenn Kante enthalten, ansonsten false
+	 */
+	private static boolean kanteEnthalten(String k) {
+		
+		Iterable<? extends Edge> iterableKante =  graph.getEachEdge();
+		
+		boolean enthalten = false;
+		
+		for (Edge kante : iterableKante) {
+			if (kante.getId().equals(k)) {
+				enthalten = true;
+			} 
+		}
+		
+		return enthalten;
+		
+	}
+	
+	
+	/**
+	 * Methode ueberprueft, ob Knoten in Graph enthalten ist und
+	 * gibt einen Boolean zurueck.
+	 * 
+	 * @param e
+	 * @return true, wenn Knoten enthalten, ansonsten false
+	 */
+	private static boolean knotenEnthalten(String k) {
+		
+		Iterable<? extends Node> iterableKnoten =  graph.getEachNode();
+		
+		boolean enthalten = false;
+		
+		for (Node knoten : iterableKnoten) {
+			if (knoten.getId().equals(k)) {
+				enthalten = true;
+			}
+		}
+		
+		return enthalten;
 		
 	}
 	
