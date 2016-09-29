@@ -3,14 +3,12 @@ package aufgabe01;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.MultiGraph;
@@ -49,8 +47,7 @@ public class Parser {
 
 		if (syntaxOK) {
 			incrementGraphID();
-//			erstellenGraphen();
-			patternDaten();
+			erstellenGraphen();
 			graph.display();
 		} else {
 			System.err.println("Der Graph konnte nicht eingelesen werden.");
@@ -59,37 +56,15 @@ public class Parser {
 	}
 	
 	/**
-	 * Methode prueft Syntax der eingelesenen Datei und gibt als Predicate<String>
+	 * Methode prueft Syntax der eingelesenen Datei und gibt Predicate<String>
 	 * für das Matchen zurueck, sodass true oder false fuer die Syntax zurueck gegeben
 	 * werden kann.
 	 * 
-	 * @return Predicate<String>
+	 * @return Predicate<String> mit regulaerem Ausdruck fuer Matching
 	 */
 	private static Predicate<String> syntaxAnforderungen() {
 		
 		return aktuelleZeile -> aktuelleZeile.matches(regexGraph);
-//				+ "(?<quelle>^[0-9a-zA-Z\\w]+)" 					// enthaelt nur Knoten
-//				+ "(((?<kante>--|->)(?<ziel>[0-9a-zA-Z\\w]+))"	// enthaelt Kante und zweiten Knoten
-//				+ "(?<kantenname>[\\(][0-9a-zA-Z\\w]+[\\)])?"		// enthaelt Kantenname
-//				+ "(?<kantengewicht>:[0-9]+.?[0-9]*)?)?"			// enthaelt Kantengewicht
-//				);
-				
-//		return PredicateUtility.orAny(
-				// enthaelt nur Knoten
-//				string -> string.matches("^[0-9a-zA-Z\\w]*$")
-				// enthaelt 2 Knoten und 1 Kante
-//                ,string -> string.matches("(^[0-9a-zA-Z\\w]*)(--|->)([0-9a-zA-Z]*$)")
-                // enthaelt 2 Knoten und 1 Kante und Kantenname
-//                ,string -> string.matches("(^[0-9a-zA-Z\\w]*)(--|->)([0-9a-zA-Z\\w]*)([\\(][0-9a-zA-Z\\w]*[\\)])")
-                // enthaelt 2 Knoten und 1 Kante und Kantengewicht
-//                ,string -> string.matches("(^[0-9a-zA-Z\\w]*)(--|->)([0-9a-zA-Z\\w]*)(:[0-9]*.?[0-9]*)")               
-                // enthaelt 2 Knoten und 1 Kante und Kantenname und Kantengewicht
-//                ,string -> string.matches("(^[0-9a-zA-Z\\w]*)(--|->)?([0-9a-zA-Z\\w]*)?([\\(][0-9a-zA-Z\\w]*[\\)])?(:[0-9]*.?[0-9]*)?")
-//				);
-		
-//		+ mindestens einer 
-//		* keiner, einer, viel
-//		? kann muss nicht
 		
 	}
 	
@@ -98,54 +73,6 @@ public class Parser {
 	 */
 	private static void incrementGraphID() {
 		++graphID;
-	}
-	
-	/**
-	 * Methode erstellt Multigraphen.
-	 */
-	private static void erstellenGraphen() {
-				
-		graph = new MultiGraph(String.valueOf(graphID));
-		System.out.println(graph);
-		
-		// durchlaufen der einzelnen Zeilen
-		for (String zeile : geleseneZeilen) {
-			String[] zeilenArray = zeile.split(" ");
-			
-			String knoten1 = zeilenArray[0].trim();
-			
-			// pruefen, ob mehr als Knoten enthalten ist
-			if (zeilenArray.length > 1) {
-			
-				String knoten2 = zeilenArray[2].trim();
-				boolean gerichteteKante = true;
-				if (zeilenArray[1].trim().equals("--")) {
-					gerichteteKante = false;
-				} else if (zeilenArray[1].trim().equals("->")) {
-					gerichteteKante = true;
-				}
-						
-
-
-					graph.addNode(knoten1);
-
-					graph.addNode(knoten2);
-
-
-				graph.addEdge((knoten1 + knoten2), knoten1, knoten2, gerichteteKante);
-
-//				Pattern 
-//				Matcher
-//				.find aufrufen, danach können Ausdrücke gefunden werden
-				
-				
-				
-			}
-			
-			System.out.println(zeile);
-			System.out.println(graph);
-		}
-		
 	}
 
 	private static void setRegex() {
@@ -157,18 +84,14 @@ public class Parser {
 				;
 	}
 		
-	private static void patternDaten() {
+	/**
+	 * Methode zum Erstellen des Graphen
+	 */
+	private static void erstellenGraphen() {
 		
 		Pattern pattern = Pattern.compile(regexGraph);
-//		String sQuelle = "null";
-//		String sZiel = "null";
-//		String sKante = "null";
-//		String sKantenname = "null";
-//		String sKantengewicht = "null";
-
 		
-		graph = new MultiGraph("bla " + String.valueOf(graphID));
-		System.out.println(graph);
+		graph = new MultiGraph(String.valueOf(graphID));
 		
 		// durchlaufen der einzelnen Zeilen
 		for (String zeile : geleseneZeilen) {
@@ -188,7 +111,6 @@ public class Parser {
 			
 			// Quelle als Knoten hinzufuegen
 			if (!knotenEnthalten(sQuelle)) {
-				System.out.println("!knotenEnthalten(sQuelle) " + (!knotenEnthalten(sQuelle)));
 				nQuelle = graph.addNode(sQuelle);
 			}
 			
@@ -215,7 +137,6 @@ public class Parser {
 					nZiel = graph.getNode(sZiel);
 				}
 				
-				System.out.println(eKante);
 				// mit gerichtetem oder ungerichtetem Pfeil
 				eKante = graph.addEdge((sQuelle+sZiel), nQuelle, nZiel, richtung);			
 				
@@ -235,13 +156,11 @@ public class Parser {
 		
 	}
 	
-	
-	
 	/**
 	 * Methode ueberprueft, ob Kante in Graph enthalten ist und
 	 * gibt einen Boolean zurueck.
 	 * 
-	 * @param e
+	 * @param String mit ID der Kante (Quelle und Ziel)
 	 * @return true, wenn Kante enthalten, ansonsten false
 	 */
 	private static boolean kanteEnthalten(String k) {
@@ -265,7 +184,7 @@ public class Parser {
 	 * Methode ueberprueft, ob Knoten in Graph enthalten ist und
 	 * gibt einen Boolean zurueck.
 	 * 
-	 * @param e
+	 * @param String mit ID der Kante
 	 * @return true, wenn Knoten enthalten, ansonsten false
 	 */
 	private static boolean knotenEnthalten(String k) {
