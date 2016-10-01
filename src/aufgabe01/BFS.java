@@ -3,6 +3,7 @@ package aufgabe01;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.MultiGraph;
@@ -12,6 +13,11 @@ public class BFS {
 	private void BFS() {}
 	
 	private static MultiGraph graph;
+	private static Node source;
+	private static Node target;
+	private static Integer markierer;
+	private static HashMap<Integer,ArrayList<Node>> gekennzeichnKnoten;
+	private static ArrayList<Node> markierteKnoten;
 	
 	public static void startenAlgorithmus(String source, String target) throws IllegalArgumentException, Exception {
 			graph = Parser.einlesenDatei();
@@ -24,13 +30,13 @@ public class BFS {
 		
 		ArrayList<Node> knotenListe = new ArrayList<>();
 		
-		HashMap<Integer,ArrayList<Node>> gekennzeichnKnoten = new HashMap<>();
+		gekennzeichnKnoten = new HashMap<>();
 		
-		Node source = graph.addNode(s);
-		Node target = graph.addNode(t);
+		source = graph.getNode(s);
+		target = graph.getNode(t);
 		
 		// i = 0 gesetzt
-		Integer markierer = 0;
+		markierer = 0;
 		
 		// source auf 0 setzen
 		knotenListe.add(source);
@@ -39,16 +45,25 @@ public class BFS {
 		boolean targetGefunden = false;
 		boolean nachbarnLeer = false;
 		
+		Node betrachteterKnoten = source;
+		
 		while(!targetGefunden && !nachbarnLeer) {
 			++markierer;
 			
-			// benachbarte Knoten ermitteln und kennzeichnen
-			gekennzeichnKnoten.put(markierer,ermittelnBenachbarteKnoten(source));
+			// benachbarte Knoten ermitteln
+			ArrayList<Node> nachbarn = new ArrayList<>(ermittelnBenachbarteKnoten(betrachteterKnoten));
+						
+			// pruefen, kein Weg zu Target vorhanden, ansonsten Nachbarn kennzeichnen
+			if (nachbarn.isEmpty()) {
+				nachbarnLeer = true;
+			} else {
+				gekennzeichnKnoten.put(markierer,nachbarn);
+			}
 			
-			// pruefen, ob Target bereits gefunden oder kein Weg zu Target vorhanden
-			if (ermittelnBenachbarteKnoten(source).isEmpty()) {nachbarnLeer = true;}
-			if (ermittelnBenachbarteKnoten(source).contains(target)) {targetGefunden = true;}
-		
+			// pruefen, ob Target bereits gefunden
+			if (nachbarn.contains(target)) {targetGefunden = true;}
+			
+			betrachteterKnoten = nachbarn.get(0);
 			
 		}
 		
@@ -62,10 +77,27 @@ public class BFS {
 		
 		while (benachbarKnotenIter.hasNext()) {
 			Node nachbar = benachbarKnotenIter.next();
-			benachbarKnotenList.add(nachbar);
+			if (bereitsMarkiert(nachbar)) {
+				benachbarKnotenList.add(nachbar);
+			}
 		}
 		
 		return benachbarKnotenList;
+	}
+	
+	
+	private static boolean bereitsMarkiert(Node knoten) {
+		
+		Set<Integer> markierungen =  gekennzeichnKnoten.keySet();
+		
+		boolean markiert = false;
+		
+		for(Integer m :markierungen) {
+			ArrayList<Node> markierteKnoten = gekennzeichnKnoten.get(m);
+			if (markierteKnoten.contains(knoten)) {markiert = true;}
+		}
+		
+		return markiert;
 	}
 
 }

@@ -116,11 +116,13 @@ public class Parser {
 			// Quelle als Knoten hinzufuegen
 			if (!knotenEnthalten(sQuelle)) {
 				nQuelle = graph.addNode(sQuelle);
+				nQuelle.addAttribute("ui.label", sQuelle);
 			}
 			
 			// Ziel als Knoten hinzufuegen
 			if(!sZiel.equals("null") && !knotenEnthalten(sZiel)) {
 				nZiel = graph.addNode(sZiel);
+				nZiel.addAttribute("ui.label", sZiel);
 			}
 			
 			// Kanten hinzufuegen
@@ -134,13 +136,11 @@ public class Parser {
 				// falls Quellknoten schon vorhanden, bestehenden Knoten aufrufen
 				if (nQuelle == null) {
 					nQuelle = graph.getNode(sQuelle);
-					nQuelle.addAttribute("ui.label", sQuelle);
 				}
 				
 				// falls Quellknoten schon vorhanden, bestehenden Knoten aufrufen
 				if (nZiel == null) {
 					nZiel = graph.getNode(sZiel);
-					nZiel.addAttribute("ui.label", sZiel);
 				}
 				
 				// mit gerichtetem oder ungerichtetem Pfeil
