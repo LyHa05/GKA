@@ -9,9 +9,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.graphstream.graph.Edge;
-import org.graphstream.graph.Node;
-import org.graphstream.graph.implementations.MultiGraph;
+import org.graphstream.graph.*;
+import org.graphstream.graph.implementations.*;
 
 public class Parser {
 	
@@ -44,12 +43,20 @@ public class Parser {
 		boolean syntaxOK = geleseneZeilen.stream().allMatch(syntaxAnforderungen());
 
 		if (syntaxOK) {
+			
 			incrementGraphID();
+			
+			graph = new MultiGraph(String.valueOf(graphID));
+	        graph.setStrict(false);
+	        graph.setAutoCreate(true);
+	        graph.display();
+			
 			erstellenGraphen();
+			
 		} else {
 			throw new IllegalArgumentException();
 		}
-		
+
 		return graph;
 		
 	}
@@ -90,8 +97,6 @@ public class Parser {
 		
 		Pattern pattern = Pattern.compile(regexGraph);
 		
-		graph = new MultiGraph(String.valueOf(graphID));
-		
 		// durchlaufen der einzelnen Zeilen
 		for (String zeile : geleseneZeilen) {
 			
@@ -129,24 +134,28 @@ public class Parser {
 				// falls Quellknoten schon vorhanden, bestehenden Knoten aufrufen
 				if (nQuelle == null) {
 					nQuelle = graph.getNode(sQuelle);
+					nQuelle.addAttribute("ui.label", sQuelle);
 				}
 				
 				// falls Quellknoten schon vorhanden, bestehenden Knoten aufrufen
 				if (nZiel == null) {
 					nZiel = graph.getNode(sZiel);
+					nZiel.addAttribute("ui.label", sZiel);
 				}
 				
 				// mit gerichtetem oder ungerichtetem Pfeil
-				eKante = graph.addEdge((sQuelle+sZiel), nQuelle, nZiel, richtung);			
+				eKante = graph.addEdge((sQuelle+sZiel), nQuelle, nZiel, richtung);
 				
 				// mit Kantenname
 				if(sKantenname != null) {
 					eKante.addAttribute("Kantenname", sKantenname);
+					eKante.addAttribute("ui.label", sKantenname);
 				}
 				
 				// mit Kantengewicht
 				if(sKantengewicht != null) {
 					eKante.addAttribute("Kantengewicht", sKantengewicht);
+					eKante.addAttribute("ui.label", sKantengewicht);
 				}
 				
 			}

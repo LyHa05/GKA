@@ -28,24 +28,44 @@ public class BFS {
 		
 		Node source = graph.addNode(s);
 		Node target = graph.addNode(t);
-			
+		
+		// i = 0 gesetzt
 		Integer markierer = 0;
 		
+		// source auf 0 setzen
 		knotenListe.add(source);
-		
 		gekennzeichnKnoten.put(markierer,new ArrayList<Node>(knotenListe));
 		
-		boolean tGefunden = false;
+		boolean targetGefunden = false;
+		boolean nachbarnLeer = false;
 		
-		while(!tGefunden) {
+		while(!targetGefunden && !nachbarnLeer) {
 			++markierer;
-			Iterator<Node> benachbarteKnoten = source.getNeighborNodeIterator();
-			while (benachbarteKnoten.hasNext()) {
-				Node nachbar = benachbarteKnoten.next();
-// TODO weiter schreiben
-			}
+			
+			// benachbarte Knoten ermitteln und kennzeichnen
+			gekennzeichnKnoten.put(markierer,ermittelnBenachbarteKnoten(source));
+			
+			// pruefen, ob Target bereits gefunden oder kein Weg zu Target vorhanden
+			if (ermittelnBenachbarteKnoten(source).isEmpty()) {nachbarnLeer = true;}
+			if (ermittelnBenachbarteKnoten(source).contains(target)) {targetGefunden = true;}
+		
+			
 		}
 		
+	}
+	
+	private static ArrayList<Node> ermittelnBenachbarteKnoten(Node knoten) {
+		
+		ArrayList<Node> benachbarKnotenList = new ArrayList<>();
+		
+		Iterator<Node> benachbarKnotenIter = knoten.getNeighborNodeIterator();
+		
+		while (benachbarKnotenIter.hasNext()) {
+			Node nachbar = benachbarKnotenIter.next();
+			benachbarKnotenList.add(nachbar);
+		}
+		
+		return benachbarKnotenList;
 	}
 
 }
