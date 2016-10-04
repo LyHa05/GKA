@@ -28,12 +28,64 @@ public class BFS {
 	
 	private static void durchfuehrenBFS(String s, String t) {
 		
+//		ArrayList<Node> knotenListe = new ArrayList<>();
+//		
+//		gekennzeichnKnoten = new HashMap<>();
+		
+		source = graph.getNode(s);
+		target = graph.getNode(t);
+		
+		benachbarteKnotenMarkieren(source);
+		
+		
+		
+//		// i = 0 gesetzt
+//		markierer = 0;
+//		
+//		// source auf 0 setzen
+//		knotenListe.add(source);
+//		gekennzeichnKnoten.put(markierer,new ArrayList<Node>(knotenListe));
+//		
+//		boolean targetGefunden = false;
+//		boolean nachbarnLeer = false;
+//		
+//		Node betrachteterKnoten = source;
+//		
+//		while(!targetGefunden && !nachbarnLeer) {
+//			++markierer;
+//			
+//			// benachbarte Knoten ermitteln
+//			ArrayList<Node> nachbarn = new ArrayList<>(ermittelnBenachbarteKnoten(betrachteterKnoten));
+//						
+//			// pruefen, kein Weg zu Target vorhanden, ansonsten Nachbarn kennzeichnen
+//			if (nachbarn.isEmpty()) {
+//				nachbarnLeer = true;
+//			} else {
+//				gekennzeichnKnoten.put(markierer,nachbarn);
+//			}
+//			
+//			// pruefen, ob Target bereits gefunden
+//			if (nachbarn.contains(target)) {targetGefunden = true;}
+//			
+//
+//			
+//			for (Node node : nachbarn) {
+//				betrachteterKnoten = node;
+//			}
+//			
+//			
+//		}
+		
+	}
+	
+	private static void benachbarteKnotenMarkieren(Node knoten) {
+		
 		ArrayList<Node> knotenListe = new ArrayList<>();
 		
 		gekennzeichnKnoten = new HashMap<>();
 		
-		source = graph.getNode(s);
-		target = graph.getNode(t);
+//		source = graph.getNode(s);
+//		target = graph.getNode(t);
 		
 		// i = 0 gesetzt
 		markierer = 0;
@@ -63,9 +115,17 @@ public class BFS {
 			// pruefen, ob Target bereits gefunden
 			if (nachbarn.contains(target)) {targetGefunden = true;}
 			
-			betrachteterKnoten = nachbarn.get(0);
+			
+			for (Node node : nachbarn) {
+				betrachteterKnoten = node;
+				
+				benachbarteKnotenMarkieren(betrachteterKnoten);
+				
+			}
+			
 			
 		}
+		
 		
 	}
 	
@@ -100,4 +160,8 @@ public class BFS {
 		return markiert;
 	}
 
+	private static void rueckverfolgenWeg() {
+		
+	}
+	
 }
