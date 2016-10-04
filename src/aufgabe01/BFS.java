@@ -18,6 +18,7 @@ public class BFS {
 	private static Integer markierer;
 	private static HashMap<Integer,ArrayList<Node>> gekennzeichnKnoten;
 	private static ArrayList<Node> markierteKnoten;
+	private static ArrayList<Node> kuerzesterWeg;
 	
 	public static void startenAlgorithmus(String source, String target) throws IllegalArgumentException, Exception {
 			graph = Parser.einlesenDatei();
@@ -99,11 +100,12 @@ public class BFS {
 		
 		Node betrachteterKnoten = source;
 		
+		// TODO Schleifenabbruch pruefen, Algorithmus wird zu schnell unterbrochen, da Liste bereits vorher leer
 		while(!targetGefunden && !nachbarnLeer) {
 			++markierer;
 			
 			// benachbarte Knoten ermitteln
-			ArrayList<Node> nachbarn = new ArrayList<>(ermittelnBenachbarteKnoten(betrachteterKnoten));
+			ArrayList<Node> nachbarn = new ArrayList<>(ermittelnBenachbarteUnmarkierteKnoten(betrachteterKnoten));
 						
 			// pruefen, kein Weg zu Target vorhanden, ansonsten Nachbarn kennzeichnen
 			if (nachbarn.isEmpty()) {
@@ -123,13 +125,11 @@ public class BFS {
 				
 			}
 			
-			
 		}
-		
 		
 	}
 	
-	private static ArrayList<Node> ermittelnBenachbarteKnoten(Node knoten) {
+	private static ArrayList<Node> ermittelnBenachbarteUnmarkierteKnoten(Node knoten) {
 		
 		ArrayList<Node> benachbarKnotenList = new ArrayList<>();
 		
@@ -162,6 +162,19 @@ public class BFS {
 
 	private static void rueckverfolgenWeg() {
 		
+//		target
+
+		ArrayList<Node> nachbarn = new ArrayList<>(gekennzeichnKnoten.get(markierer));
+		
+		kuerzesterWeg.set(markierer, target);
+		
+		while (!kuerzesterWeg.contains(source)) {
+			
+			--markierer;
+			nachbarn = gekennzeichnKnoten.get(markierer);
+			
+			
+		}
 	}
 	
 }
