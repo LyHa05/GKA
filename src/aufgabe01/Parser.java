@@ -1,5 +1,6 @@
 package aufgabe01;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,9 +27,10 @@ public class Parser {
 	 * Methode liest aus Datei Graph ein, prueft die Syntax, inkrementiert die Graphen-ID
 	 * und erstellt einen Multigraphen. Ist die Syntax der Datei fehlerhaft wird eine
 	 * Fehlermeldung angezeigt.
-	 * @throws Exception 
+	 * @throws IOException 
+	 * @throws IllegalArgumentException 
 	 */
-	public static MultiGraph einlesenDatei() throws Exception, IllegalArgumentException {
+	public static MultiGraph einlesenDatei() throws IllegalArgumentException, IOException {
 		dateiPfad = MeinFileChooser.chooseFile().toPath();
 		System.out.println(dateiPfad);
 		geleseneZeilen = Files.lines(dateiPfad,Charset.forName("ISO_8859_1"))
@@ -54,7 +56,7 @@ public class Parser {
 			erstellenGraphen();
 			
 		} else {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Der Graph konnte nicht eingelesen werden.");
 		}
 
 		return graph;

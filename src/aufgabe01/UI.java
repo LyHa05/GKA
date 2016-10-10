@@ -1,16 +1,20 @@
 package aufgabe01;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class UI {
+	
+    static InputStreamReader isr = new InputStreamReader(System.in);
+    static BufferedReader br = new BufferedReader(isr);
 	
 	private void UI() {}
 	
 	private static void start() throws IllegalArgumentException, Exception {
 		
-	    InputStreamReader isr = new InputStreamReader(System.in);
-	    BufferedReader br = new BufferedReader(isr);
+//	    InputStreamReader isr = new InputStreamReader(System.in);
+//	    BufferedReader br = new BufferedReader(isr);
 		
 		System.out.println("Moechten Sie");
 		System.out.println("\t (a) einen Graphen einlesen und darstellen");
@@ -19,18 +23,22 @@ public class UI {
 		System.out.println("\t (x) das Programm beenden");
 		String eingabe = br.readLine();
 		
-		pruefenEingabe(eingabe);
+		eingabePruefenMenue(eingabe);
 		
 	}
 
-	private static void pruefenEingabe(String s) throws Exception, IllegalArgumentException {
+	private static void eingabePruefenMenue(String s) throws Exception, IllegalArgumentException {
 			switch(s) {
 				case "a": {
 					Parser.einlesenDatei().display();
 					break;
 				}
-				case "b": {			
-					BFS.startenAlgorithmus("s", "t");
+				case "b": {
+					System.out.println("Bitte geben Sie den Startknoten an.");
+					String source = br.readLine();
+					System.out.println("Bitte geben Sie den Zielknoten an.");
+					String target = br.readLine();
+					BFS.startenAlgorithmus(source, target);
 					break;
 				}
 				case "c": {
@@ -53,11 +61,12 @@ public class UI {
 			start();
 		} catch (IllegalArgumentException e) {
 			System.err.println(e);
-//			System.err.println("Der Graph konnte nicht eingelesen werden.");
-		} catch (Exception e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 			System.err.println(e);
-//			System.err.println("Die Datei konnte nicht gelesen werden.");
+			System.err.println("Die Datei konnte nicht gelesen werden.");
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 }
