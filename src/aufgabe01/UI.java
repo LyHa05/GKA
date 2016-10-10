@@ -29,8 +29,8 @@ public class UI {
 					Parser.einlesenDatei().display();
 					break;
 				}
-				case "b": {
-					BFS.startenAlgorithmus(s, s);
+				case "b": {			
+					BFS.startenAlgorithmus("s", "t");
 					break;
 				}
 				case "c": {
@@ -52,9 +52,12 @@ public class UI {
 		try {
 			start();
 		} catch (IllegalArgumentException e) {
-			System.err.println("Der Graph konnte nicht eingelesen werden.");
+			System.err.println(e);
+//			System.err.println("Der Graph konnte nicht eingelesen werden.");
 		} catch (Exception e) {
-			System.err.println("Die Datei konnte nicht gelesen werden.");
+			e.printStackTrace();
+			System.err.println(e);
+//			System.err.println("Die Datei konnte nicht gelesen werden.");
 		}
 	}
 }

@@ -1,8 +1,11 @@
 package aufgabe01;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.graphstream.graph.Node;
@@ -18,12 +21,20 @@ public class BFS {
 	private static Integer markierer;
 	private static HashMap<Integer,ArrayList<Node>> gekennzeichnKnoten;
 	private static ArrayList<Node> markierteKnoten;
-	private static ArrayList<Node> kuerzesterWeg;
+	private static HashMap<Integer,ArrayList<Node>> kuerzesterWeg;
 	
 	public static void startenAlgorithmus(String source, String target) throws IllegalArgumentException, Exception {
 			graph = Parser.einlesenDatei();
 			
 			durchfuehrenBFS(source, target);
+			
+			for(Entry<Integer, ArrayList<Node>> entry : gekennzeichnKnoten.entrySet()){
+			    System.out.printf("Nummer : %s and Knoten: %s %n", entry.getKey(), entry.getValue());
+			}
+			
+			System.out.println("-------------gekennzeichnKnoten zu Ende---------------");
+			
+			rueckverfolgenWeg();
 			
 	}
 	
@@ -100,6 +111,9 @@ public class BFS {
 		
 		Node betrachteterKnoten = source;
 		
+		System.out.println("targetGefunden:" + targetGefunden);
+		System.out.println("nachbarnLeer: " + nachbarnLeer);
+		
 		// TODO Schleifenabbruch pruefen, Algorithmus wird zu schnell unterbrochen, da Liste bereits vorher leer
 		while(!targetGefunden && !nachbarnLeer) {
 			++markierer;
@@ -127,6 +141,7 @@ public class BFS {
 			
 		}
 		
+		System.out.println("benachbarteKnotenMarkieren() fertig");
 	}
 	
 	private static ArrayList<Node> ermittelnBenachbarteUnmarkierteKnoten(Node knoten) {
@@ -161,20 +176,90 @@ public class BFS {
 	}
 
 	private static void rueckverfolgenWeg() {
-		
-//		target
 
-		ArrayList<Node> nachbarn = new ArrayList<>(gekennzeichnKnoten.get(markierer));
+//		ArrayList<Node> nachbarn = new ArrayList<>(gekennzeichnKnoten.get(markierer));
 		
-		kuerzesterWeg.set(markierer, target);
+		kuerzesterWeg = new HashMap<>();
 		
-		while (!kuerzesterWeg.contains(source)) {
+		// target in kuerzestesterWeg mit aufnehmen
+		ArrayList<Node> targetArrayList = new ArrayList<>();
+		targetArrayList.add(target);
+		kuerzesterWeg.put(markierer, targetArrayList);
+		
+
+		
+		ermittelnBenachbarteMarkierteKnoten(target);
+		
+//		while (!kuerzesterWeg.contains(source)) {
+//		
+//			Iterator<Node> nachbarKnotenIter = betrachteterKnoten.getNeighborNodeIterator();
+//			
+//			--markierer;
+//			
+//			ArrayList<Node> tempArray = new ArrayList<>();
+//			Node nachbar = null;
+//						
+//			while (nachbarKnotenIter.hasNext()) {
+//				nachbar = nachbarKnotenIter.next();
+//				if (gekennzeichnKnoten.get(markierer).contains(nachbar)) {
+//					tempArray.add(nachbar);
+//				}
+//			}
+//			
+//			betrachteterKnoten = nachbar;
+//		
+//			
+////			--markierer;
+////			nachbarn = gekennzeichnKnoten.get(markierer);
+//			
+//		
+//			
+//		}
+		
+		for(Entry<Integer, ArrayList<Node>> entry : kuerzesterWeg.entrySet()){
+		    System.out.printf("Nummer : %s and Knoten: %s %n", entry.getKey(), entry.getValue());
+		}
+
+		
+//		for (HashMap<Integer, ArrayList<Node>> knoten : kuerzesterWeg) {
+//			System.out.println("Nummer: " + knoten.kuerzesterWeg..indexOf(knoten));
+//			System.out.println(knoten);
+//		}
+		
+	}
+	
+	
+	private static void ermittelnBenachbarteMarkierteKnoten(Node knoten) {
+		
+		Node betrachteterKnoten = knoten;
+		
+		while (!kuerzesterWeg.get(markierer).contains(source)) {
+			
+			Iterator<Node> nachbarKnotenIter = betrachteterKnoten.getNeighborNodeIterator();
 			
 			--markierer;
-			nachbarn = gekennzeichnKnoten.get(markierer);
 			
+			ArrayList<Node> tempArray = new ArrayList<>();
+			Node nachbar = null;
+						
+			while (nachbarKnotenIter.hasNext()) {
+				nachbar = nachbarKnotenIter.next();
+				System.out.println("gekennzeichnKnoten: " + gekennzeichnKnoten);
+				System.out.println("markierer: " + markierer);
+				System.out.println("nachbar: " + nachbar);
+				if (gekennzeichnKnoten.get(markierer).contains(nachbar)) {
+					tempArray.add(nachbar);
+				}
+			}
+			
+			kuerzesterWeg.put(markierer, tempArray);
+			
+			ermittelnBenachbarteMarkierteKnoten(nachbar);
 			
 		}
+		
 	}
 	
 }
+
+
