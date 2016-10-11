@@ -2,8 +2,8 @@ package aufgabe01;
 
 /**
  * @author Lydia Pflug, Lucas Anders
- * @date 27.09.2016
- *
+ * @date 11.10.2016
+ * Diese Klasse stellt einen File-Chooser bereit.
  */
 
 import java.io.File;

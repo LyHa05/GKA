@@ -13,6 +13,14 @@ import java.util.stream.Stream;
 import org.graphstream.graph.*;
 import org.graphstream.graph.implementations.*;
 
+/**
+ * @author Lydia Pflug, Lucas Anders
+ * @date 11.10.2016
+ * Diese Klasse liest einen Graphen aus einer .gka-Datei ein und parst daraus mit Hilfe
+ * der GraphStream-Bibliothek einen Graphen.
+ */
+
+
 public class Parser {
 	
 	private void Parser() {}

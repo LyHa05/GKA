@@ -4,6 +4,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+/**
+ * @author Lydia Pflug, Lucas Anders
+ * @date 11.10.2016
+ * Diese Klasse stellt ein Menue fuer die Graphenerstellung
+ * und verschiedene Algorithmen bereit.
+ */
+
 public class UI {
 	
     static InputStreamReader isr = new InputStreamReader(System.in);
@@ -11,10 +18,12 @@ public class UI {
 	
 	private void UI() {}
 	
+	/**
+	 * Die Methode startet die Anwendung und stellt das Menue auf der Konsole dar.
+	 * @throws IllegalArgumentException
+	 * @throws Exception
+	 */
 	private static void start() throws IllegalArgumentException, Exception {
-		
-//	    InputStreamReader isr = new InputStreamReader(System.in);
-//	    BufferedReader br = new BufferedReader(isr);
 		
 		System.out.println("Moechten Sie");
 		System.out.println("\t (a) einen Graphen einlesen und darstellen");
@@ -27,6 +36,13 @@ public class UI {
 		
 	}
 
+	/**
+	 * Die Methode prueft die Eingabe aus dem Menue und ruft die entsprechende Methode
+	 * bzw. Klasse fuer die gewaehlte Funktionalitaet auf.
+	 * @param s
+	 * @throws Exception
+	 * @throws IllegalArgumentException
+	 */
 	private static void eingabePruefenMenue(String s) throws Exception, IllegalArgumentException {
 			switch(s) {
 				case "a": {

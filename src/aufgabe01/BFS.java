@@ -6,8 +6,16 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.MultiGraph;
+
+/**
+ * @author Lydia Pflug, Lucas Anders
+ * @date 11.10.2016
+ * Diese Klasse implementiert den BFS-Algorithmus und gibt den kuerzsten
+ * Weg aus.
+ */
 
 public class BFS {
 	
@@ -19,13 +27,23 @@ public class BFS {
 	private static Integer markierer;
 	private static HashMap<Integer,ArrayList<Node>> gekennzeichnKnoten;
 	private static HashMap<Integer,ArrayList<Node>> kuerzesterWeg;
+	private static boolean targetGefunden = false;
+	private static boolean nachbarnLeer = false;
 	
+	/**
+	 * Die Methode liest den Graph, startet den BFS-Algorithmus
+	 * und gibt am Ende den kuerzesten Weg aus.
+	 * @param source
+	 * @param target
+	 * @throws IllegalArgumentException
+	 * @throws Exception
+	 */
 	public static void startenAlgorithmus(String source, String target) throws IllegalArgumentException, Exception {
 			graph = Parser.einlesenDatei();
 			
 			if (eingabeKnotenPruefen(source) && eingabeKnotenPruefen(target)) {
 			
-				durchfuehrenBFS(source, target);
+				hinwegVerfolgen(source, target);
 				
 				for(Entry<Integer, ArrayList<Node>> entry : gekennzeichnKnoten.entrySet()){
 				    System.out.printf("Nummer : %s and Knoten: %s %n", entry.getKey(), entry.getValue());
@@ -33,7 +51,7 @@ public class BFS {
 				
 				System.out.println("-------------gekennzeichnKnoten zu Ende---------------");
 				
-				rueckverfolgenWeg();
+				rueckwegVerfolgen();
 				
 				for(Entry<Integer, ArrayList<Node>> entry : kuerzesterWeg.entrySet()){
 				    System.out.printf("Nummer : %s and Knoten: %s %n", entry.getKey(), entry.getValue());
@@ -46,6 +64,12 @@ public class BFS {
 			
 	}
 	
+	/**
+	 * Die Methode ueberprueft, ob die eingegebenen Knoten(Source, Target)
+	 * fuer den Algorithmus im eingelesenen Graphen enthalten sind. 
+	 * @param eingabe
+	 * @return true, wenn Knoten im Graphen enthalten sind, ansonsten false
+	 */
 	private static boolean eingabeKnotenPruefen(String eingabe) {
 		Iterator<? extends Node> iterNode = graph.getEachNode().iterator();
 		boolean enthalten = false;
@@ -59,6 +83,9 @@ public class BFS {
 		return enthalten;
 	}
 	
+	/**
+	 * Methode gibt den kuerzesten Weg als Ergebnis des Algorithmus BFS aus.
+	 */
 	private static void ausgabeKuerzesterWeg() {
 		
 		StringBuilder sb = new StringBuilder();
@@ -83,7 +110,13 @@ public class BFS {
 		
 	}
 	
-	private static void durchfuehrenBFS(String s, String t) {
+	/**
+	 * Methode nimmt Initialisierungen fuer den Hinweg des Alsgorithmus vor
+	 * und ruft die Methode zum Markieren der benachbarten unmarkierten Knoten auf.
+	 * @param s
+	 * @param t
+	 */
+	private static void hinwegVerfolgen(String s, String t) {
 		
 		source = graph.getNode(s);
 		target = graph.getNode(t);
@@ -102,11 +135,13 @@ public class BFS {
 		
 	}
 	
+	/**
+	 * Methode markiert benachbarte unmarkierte Knoten bis der Zielknoten gefunden
+	 * worden ist oder es keine zu markierenden Nachbarn mehr gibt.
+	 * @param knoten
+	 */
 	private static void benachbarteKnotenMarkieren(Node knoten) {
-			
-		boolean targetGefunden = false;
-		boolean nachbarnLeer = false;
-		
+					
 		Node betrachteterKnoten = knoten;
 		
 		// Schleifendurchlauf bis target gefunden worden ist
@@ -122,9 +157,6 @@ public class BFS {
 			} else {
 				++markierer;
 				gekennzeichnKnoten.put(markierer,nachbarn);
-				System.out.println("markierer: " + markierer);
-				System.out.println("gekennzeichnKnoten: " + gekennzeichnKnoten);
-				
 			}
 			
 			// pruefen, ob Target bereits gefunden
@@ -141,6 +173,11 @@ public class BFS {
 		}
 	}
 	
+	/**
+	 * Die Methode ermittelt alle benachbarten Knoten, die noch unmarkiert sind.
+	 * @param knoten
+	 * @return ArrayList<Node> mit benachbarten und unmarkierten Knoten
+	 */
 	private static ArrayList<Node> ermittelnBenachbarteUnmarkierteKnoten(Node knoten) {
 		
 		ArrayList<Node> benachbarKnotenList = new ArrayList<>();
@@ -149,14 +186,30 @@ public class BFS {
 		
 		while (benachbarKnotenIter.hasNext()) {
 			Node nachbar = benachbarKnotenIter.next();
-			if (!bereitsMarkiert(nachbar)) {
-				benachbarKnotenList.add(nachbar);
+			Edge kante = nachbar.getEdgeBetween(knoten);
+			// gerichtete Kanten
+			if (kante.isDirected()){
+				if(kante.getSourceNode().equals(nachbar) && !bereitsMarkiert(nachbar)) {
+					benachbarKnotenList.add(nachbar);
+				}
+			// ungerichtete Kanten
+			} else {
+				if (!bereitsMarkiert(nachbar)) {
+					benachbarKnotenList.add(nachbar);
+				}
 			}
+
 		}
 		
 		return benachbarKnotenList;
 	}
 	
+	/**
+	 * Methode prueft, ob Knoten bereits markiert ist und gibt entsprechend einen
+	 * Boolean zurueck.
+	 * @param knoten
+	 * @return true, wenn Knoten bereits markiert ist, ansonsten false
+	 */
 	private static boolean bereitsMarkiert(Node knoten) {
 		
 		Set<Integer> markierungen =  gekennzeichnKnoten.keySet();
@@ -171,7 +224,11 @@ public class BFS {
 		return markiert;
 	}
 
-	private static void rueckverfolgenWeg() {
+	/**
+	 * Methode nimmt Initialisierungen fuer den Rueckweg des Alsgorithmus vor
+	 * und ruft die Methode zum Ermitteln der benachbarten markierten Knoten auf.
+	 */
+	private static void rueckwegVerfolgen() {
 		
 		kuerzesterWeg = new HashMap<>();
 
@@ -184,6 +241,11 @@ public class BFS {
 			
 	}
 	
+	/**
+	 * Die Methode ermittelt alle benachbarten Knoten, die der naechst niedrigeren
+	 * Markierung entsprechen.
+	 * @param knoten
+	 */
 	private static void ermittelnBenachbarteMarkierteKnoten(Node knoten) {
 		
 		Node betrachteterKnoten = knoten;
